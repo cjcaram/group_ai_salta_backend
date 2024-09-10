@@ -2,9 +2,11 @@ import OpenAI from 'openai';
 import express from 'express';
 import dotenv from 'dotenv';
 import { Cache } from '../utils/Cache'
+import multer from 'multer';
 
 dotenv.config();
 
+const upload = multer(); // Use multer for handling file uploads
 const router = express.Router();
 const myCache = new Cache<string>(300000);
 
@@ -71,13 +73,13 @@ async function createThreadAndRun (prompt: string) {
     }
 }
 
-router.post('/send', async (req: Request, res: Response) => {
+router.post('/send', async (req, res) => {
     const response = await createThreadAndRun(req.body.data);
     console.log(JSON.stringify(response));
     res.json({ result: response });
 });
 
-router.post('/send-async', async (req: Request, res: Response) => {
+router.post('/send-stream', async (req, res) => {
 
     if (req.body.data == null) {
         return '';
@@ -113,6 +115,21 @@ router.post('/send-async', async (req: Request, res: Response) => {
         }
     });
 });
+
+router.get('/hello', (req, res) => res.send({message:"Hello word"})
+)
+
+router.post('/test', upload.single('archivo'), (req, res) => {
+    const { pregunta, tipoDocumento } = req.body;
+    const archivo = req.file; // Access the uploaded file
+  
+    // Handle the form data and file as needed
+    console.log('Pregunta:', pregunta);
+    console.log('Tipo Documento:', tipoDocumento);
+    console.log('Archivo:', archivo);
+  
+    res.json({ message: 'Form received successfully' });
+  });
 
 
 export default router;
