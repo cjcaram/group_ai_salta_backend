@@ -34,71 +34,25 @@ const openAI = new OpenAI({
 const assistantId = process.env.ASSISTANT_ID;
 const vectorID = process.env.LEYES_SALTA_VS_ID;
 
-async function getThreadID (key: string, prompt: string, fileStream :fs.ReadStream | null) : Promise<string> {
+async function getThreadID (key: string, prompt: string) : Promise<string> {
     let threadIDCached: string | null= myCache.get(key);
     if (threadIDCached == null) {
         console.log("Getting thread")
-        let thread;
-        if (fileStream == null) {
-            thread = await openAI.beta.threads.create({
-                messages: [
-                  {
-                    role: 'user',
-                    content: prompt,
-                  },
-                ],
-                tool_resources: {
-                    "file_search": {
-                        "vector_store_ids": [vectorID]
-                    }
-                }
-              });
-        } else {
-            console.log("creating thread with file");
-            const fileUploaded = await openAI.files.create({
-                file: fileStream,
-                purpose: "assistants",
-            });
-            console.log("fileUploaded: " + fileUploaded.filename+ " id:" + fileUploaded.id );
-            thread = await openAI.beta.threads.create({
-                messages: [
-                  {
-                    role: "user",
-                    content: prompt + ` Considerar documento adjunto a este mensaje con nombre = ${fileUploaded.filename} y id = ${fileUploaded.id}`,
-                    attachments: [{ file_id: fileUploaded.id, tools: [{ type: "file_search" }] }],
-                  },
-                ]
-              });
-        }
-
+        
+        const thread = await openAI.beta.threads.create({
+            messages: [
+                { role: 'user', content: prompt, },
+            ],
+            tool_resources: { "file_search": { "vector_store_ids": [vectorID] } }
+        });
         threadIDCached = thread.id;
         myCache.set(key, threadIDCached);
     } else {
         console.log("reusing thread : " + threadIDCached)
 
-        let threadMessages;
-        if (fileStream == null) {
-            threadMessages = await openAI.beta.threads.messages.create(
-                threadIDCached,
-                { role: "user", content: prompt }
-              );
-        } else {
-            const fileUploaded = await openAI.files.create({
-                file: fileStream,
-                purpose: "assistants",
-            });
-
-            threadMessages = await openAI.beta.threads.messages.create(
-                threadIDCached,
-                { 
-                    role: "user", 
-                    content: prompt + ` Considerar documento adjunto a este mensaje con nombre = ${fileUploaded.filename} y id = ${fileUploaded.id}`,
-                    attachments: [{ file_id: fileUploaded.id, tools: [{ type: "file_search" }] }]
-                }
-              );
-            }
-        console.log(threadMessages);
-
+        const threadMessages = await openAI.beta.threads.messages.create(
+            threadIDCached, { role: "user", content: prompt });
+            
     }
     console.log('Using thread with Id: ' + threadIDCached);
     return threadIDCached;
@@ -106,7 +60,7 @@ async function getThreadID (key: string, prompt: string, fileStream :fs.ReadStre
 
 async function createThreadAndRun (prompt: string) {
     try {
-        let threadId : string = await getThreadID('user1', prompt, null);
+        let threadId : string = await getThreadID('user1', prompt);
         
         const run = await openAI.beta.threads.runs.createAndPoll(threadId, {
             assistant_id: assistantId,
@@ -140,7 +94,7 @@ router.post('/send-stream', async (req, res) => {
         return '';
     }
 
-    let threadId : string = await getThreadID('user1', req.body.data, null);
+    let threadId : string = await getThreadID('user1', req.body.data);
     const stream = openAI.beta.threads.runs
     .stream(threadId, {
         assistant_id: assistantId,
@@ -171,28 +125,39 @@ router.post('/send-stream', async (req, res) => {
     });
 });
 
-router.post('/test-file-send', upload.single('archivo'), async (req, res) => {
-    const { pregunta, tipoDocumento } = req.body;
-    const archivo = req.file; // Access the uploaded file
+router.post('/test-file-send', upload.single('attachment'), async (req, res) => {
+    const { additionalInfo, evidenceDescription } = req.body;
     
+    const fileAttached = req.file;
+    let prompt = "Cuando fue promulgada la ley del documento adjunto?";
 
-    if (!archivo) {
-        return res.status(400).json({ message: 'No file uploaded' });
+    if (!fileAttached) {
+        return res.status(400).json({ message: 'Archivo no adjunto o formato no valido' });
     }
 
-    
     // Get the full path of the uploaded file
-    const filePath = path.join(__dirname, 'uploads', archivo.filename);
+    const filePath = path.join(__dirname, 'uploads', fileAttached.filename);
 
     // Create a readable stream of the file
     const fileStream = fs.createReadStream(filePath);
+    
+    let threadId : string = await getThreadID('user1', prompt);
 
-    let threadId : string = await getThreadID('user1', pregunta, fileStream);
+    const fileUploaded = await openAI.files.create({
+        file: fileStream,
+        purpose: "assistants",
+    });
     
     const run = await openAI.beta.threads.runs.createAndPoll(threadId, {
         assistant_id: assistantId,
         additional_instructions: 'Por favor usa los documentos provistos para responder preguntas de indole legal.',
-        
+        additional_messages: [
+            { 
+                role: "user", 
+                content: ` Considerar documento adjunto a este mensaje con nombre = ${fileUploaded.filename} y id = ${fileUploaded.id}`,
+                attachments: [{ file_id: fileUploaded.id, tools: [{ type: "file_search" }] }]
+            }
+        ]
     });
 
     console.log('Run finished with status: ' + run.status);
@@ -206,19 +171,41 @@ router.post('/test-file-send', upload.single('archivo'), async (req, res) => {
 });
 
 
+router.post('/test-file-retrieve', async (req, res) => {
+    let threadID = "thread_x84DqLrEq3DoIMIhjfkGEbcZ";
+    console.log("Processing request -zxZ-")
+    const messages = await openAI.beta.threads.messages.list(threadID);
+    
+    const fileId = messages.data[0].attachments[0].file_id;
+    const responseFile = await openAI.files.content(fileId);
+    const runID = messages.data[0].run_id;
+    const file = await responseFile.arrayBuffer();
+    const file_data_buffer = Buffer.from(file);
 
+    const downloadPath = `${__dirname}downloads/${threadID}-${runID}.docx`;
+    fs.writeFileSync(downloadPath, file_data_buffer);
+
+    const fileUrl = `${req.protocol}://${req.get('host')}/api/downloads/${threadID}-${runID}.docx`;
+    
+    res.json({ message: 'Se ha generado el archivo .docx con la contestación de demanda solicitada. Puedes descargarlo utilizando el siguiente enlace:', 
+        fileUrl: fileUrl });
+}); 
+
+router.get('/downloads/:filename', (req, res) => {
+    const filename = req.params.filename;
+    const filePath = path.join(__dirname, 'downloads', filename);
+    res.download(filePath, (err) => {
+        if (err) {
+            console.error('Error downloading file:', err);
+            res.status(500).send('Error downloading file');
+        }
+    });
+});
 
 // TEST 
 
 router.get('/hello', (req, res) => res.send({message:"Hello word"})
 )
-
-router.post('/test', upload.single('archivo'), (req, res) => {
-    const { pregunta, tipoDocumento } = req.body;
-    const archivo = req.file; // Access the uploaded file
-  
-    res.json({ message: `Pregunta: ${pregunta}, Tipo Documento: ${tipoDocumento}, Archivo: ${archivo?.originalname || 'No archivo subido'}` });
-  });
 
 
 export default router;
