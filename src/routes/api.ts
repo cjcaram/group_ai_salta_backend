@@ -69,10 +69,10 @@ router.post('/contestar-una-demanda', upload.single('attachment'), async (req, r
 
         2.a - Objeto: Exponer el propósito de la contestación y solicitar el rechazo de la demanda.
         2.b - Hechos: Relatar los hechos desde la perspectiva de la parte demandada.
-        2.c - Falta de prueba: Argumentar la falta de prueba de los daños invocados por la parte actora.
-        2.d - Negación de daños extrapatrimoniales y punitivos: Refutar la procedencia de estos daños.
+        2.c - Falta de prueba: Argumentar la falta de prueba suficiente de los daños invocados por la parte actora.
+        2.d - Negación de daños: Refutar la procedencia de daños.
         2.e - Responsabilidad del demandado: Sostener que el demandado actuó conforme a lo pactado y a la legislación vigente.
-        2.f - Citar jurisprudencia local: Referir a jurisprudencia de la provincia de Salta que respalde los argumentos.
+        2.f - Citar jurisprudencia: Preferentemente referir a jurisprudencia de la provincia de Salta que respalde los argumentos.
         2.g - Derecho: Incluir referencias a normas aplicables, como el Código Civil y Comercial, la Ley de Defensa del Consumidor, entre otras.
         
         3 - Petitorio:
@@ -81,10 +81,10 @@ router.post('/contestar-una-demanda', upload.single('attachment'), async (req, r
         
         ${additionalInfo ? `Información adicional:
 
-        Considerar la siguiente información adicional provista por el demandado para realizar la contestación: ${additionalInfo}` : ''}
-        ${evidenceDescription ? `Descripción de la evidencia: Además, incluir la siguiente descripción de la evidencia (solo una descripción de los documentos que serán adjuntados a la contestación de demanda): ${evidenceDescription}.` : ''}
+        Considerar la siguiente información adicional provista por el demandado para argumentar la contestación de la demanda, impugnar alguna prueba, negar algun hecho, plantear una excepción procesal o interponer una nulidad: ${additionalInfo}` : ''}
+        ${evidenceDescription ? `Descripción de la prueba: Incluir en un apartado de la contestación de la demanda como prueba a favor del demandado (solo una descripción de los documentos que serán adjuntados a la contestación de demanda): ${evidenceDescription}.` : ''}
+        
         Formato de la respuesta:
-
         La respuesta debe ser un archivo .docx, correctamente formateado, donde el contenido del archivo sea únicamente la contestación de la demanda.`;
 
     const filePath = path.join(__dirname, 'uploads', fileAttached.filename);
