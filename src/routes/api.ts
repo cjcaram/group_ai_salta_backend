@@ -1,29 +1,26 @@
-import OpenAI from 'openai';
 import express from 'express';
 import dotenv from 'dotenv';
-import { Cache } from '../utils/Cache'
 import multer from 'multer';
-import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { OpenAIService } from '../services/openaiService';
-import { AIFormattedResponse } from 'dto/AIFormattedResponse';
+import { AIFormattedResponse } from '../dto/AIFormattedResponse';
+import jwt from 'jsonwebtoken';
+import User from '../models/user';
+import { authenticateToken } from '../middleware/auth';
+
+/// CONFIG
 
 dotenv.config();
 
+const secret = process.env.JWT_SECRET || 'your_jwt_secret';
+
 const openAiService = new OpenAIService();
-
 const router = express.Router();
-const myCache = new Cache<string>(300000);
-
-const assistantId = process.env.ASSISTANT_ID;
-const vectorID = process.env.LEYES_SALTA_VS_ID;
-
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const thisFileDirName = path.dirname(__filename);
 const __dirname = thisFileDirName.substring(0, thisFileDirName.indexOf(process.env.PROJECT_NAME) + process.env.PROJECT_NAME.length + 1); 
 
-// Multer Configuration
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
         callback(null, 'uploads/');
@@ -32,13 +29,12 @@ const storage = multer.diskStorage({
         callback(null, file.originalname);
     },
   });
+
 const upload = multer({ storage: storage });
 
-const openAI = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-});
+// DOWNLOAD FILES
 
-router.get('/downloads/:filename', (req, res) => {
+router.get('/downloads/:filename', authenticateToken, (req, res) => {
     const filename = req.params.filename;
     const filePath = path.join(__dirname, 'downloads', filename);
     res.download(filePath, (err) => {
@@ -49,7 +45,9 @@ router.get('/downloads/:filename', (req, res) => {
     });
 });
 
-router.post('/contestar-una-demanda', upload.single('attachment'), async (req, res) => {
+// OPENAI
+
+router.post('/contestar-una-demanda', authenticateToken, upload.single('attachment'), async (req, res) => {
     const { additionalInfo, evidenceDescription } = req.body;
     
     const fileAttached = req.file;
@@ -99,5 +97,10 @@ router.post('/contestar-una-demanda', upload.single('attachment'), async (req, r
 router.get('/hello', (req, res) => res.send({message:"Hello word"})
 )
 
+// Example protected route
+router.get('/protected-route', authenticateToken, (req, res) => {
+    console.log('Usuario autenticado:', req.user);
+    res.json({ message: `Bienvenido, ${req.user?.username}` });
+});
 
 export default router;
