@@ -29,10 +29,9 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    lastActive: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
+    refreshToken: {
+        type: DataTypes.TEXT,
+        allowNull: true,
       },
   },
   {

@@ -5,8 +5,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { OpenAIService } from '../services/openaiService';
 import { AIFormattedResponse } from '../dto/AIFormattedResponse';
-import jwt from 'jsonwebtoken';
-import User from '../models/user';
 import { authenticateToken } from '../middleware/auth';
 
 /// CONFIG

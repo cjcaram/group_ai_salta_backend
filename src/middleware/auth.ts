@@ -11,7 +11,12 @@ export const authenticateToken = async (
   next: NextFunction
 ) => {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  let token = authHeader && authHeader.split(' ')[1];
+
+  // If token is not provided, then obtain from cookies
+  if (!token) {
+    token = req.cookies.accessToken;
+  }
 
   if (!token) return res.status(401).json({ error: 'Token no proporcionado' });
 
