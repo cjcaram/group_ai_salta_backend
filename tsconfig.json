@@ -15,8 +15,8 @@
       "@utils/*": ["utils/*"]
     },
     "esModuleInterop": true,
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
+    // "allowImportingTsExtensions": true,
+    // "noEmit": true, line commented to allow generate ts files when exeuting npm run build
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
