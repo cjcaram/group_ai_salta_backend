@@ -6,8 +6,8 @@
   },
   "compilerOptions": {
     "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "node",
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "outDir": "./dist",
     "rootDir": "./src",
     "baseUrl": "./src",
@@ -15,6 +15,7 @@
       "@utils/*": ["utils/*"]
     },
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     // "allowImportingTsExtensions": true,
     // "noEmit": true, line commented to allow generate ts files when exeuting npm run build
     "skipLibCheck": true,

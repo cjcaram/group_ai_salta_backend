@@ -3,9 +3,9 @@ import dotenv from 'dotenv';
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { OpenAIService } from '../services/openaiService';
-import { AIFormattedResponse } from '../dto/AIFormattedResponse';
-import { authenticateToken } from '../middleware/auth';
+import { OpenAIService } from '../services/openaiService.js';
+import { AIFormattedResponse } from '../dto/AIFormattedResponse.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 /// CONFIG
 

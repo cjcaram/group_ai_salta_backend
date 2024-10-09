@@ -1,10 +1,10 @@
-import { Cache } from '../utils/Cache'
+import { Cache } from '../utils/Cache.js'
 import { OpenAI } from 'openai';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { AIFormattedResponse } from 'dto/AIFormattedResponse';
+import { AIFormattedResponse } from 'dto/AIFormattedResponse.js';
 
 dotenv.config();
 

@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import User from '../models/user';
-import { TokenPayload } from 'dto/TokenPayload';
-import { authenticateToken } from '../middleware/auth';
+import User from '../models/user.js';
+import { TokenPayload } from 'dto/TokenPayload.js';
+import { authenticateToken } from '../middleware/auth.js';
 import { body, validationResult } from 'express-validator';
 
 const router = Router();
