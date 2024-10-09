@@ -12,15 +12,16 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 app.use(cors({
-    origin: 'http://localhost:5173', // URL de tu frontend
+    origin: FRONTEND_URL,
     credentials: true,
   }));
 app.use(express.json());
 app.use(cookieParser());
 app.use('/api', apiRoutes);
-app.use('/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 
 sequelize.sync().then(() => {
     console.log('Base de datos sincronizada!');
