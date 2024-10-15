@@ -10,6 +10,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
+    "build:migrations": "tsc --project tsconfig.migrations.json",
     "start": "node dist/app.js",
     "dev": "node --env-file=.env --no-warnings=ExperimentalWarning --loader ts-node/esm src/app.ts"
   },
@@ -29,12 +30,15 @@
     "openai": "^4.57.0",
     "pg": "^8.13.0",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.3"
+    "sequelize": "^6.37.4",
+    "sequelize-cli": "^6.6.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^4.17.21",
     "@types/node": "^22.5.2",
+    "@types/pg": "^8.11.10",
+    "@types/sequelize": "^4.28.20",
     "nodemon": "^3.1.4",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
