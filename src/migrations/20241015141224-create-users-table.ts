@@ -1,41 +1,33 @@
-import { QueryInterface, DataTypes } from 'sequelize';
-
-export default {
-  up: async (queryInterface: QueryInterface) => {
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('users', {
       id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
+        type: Sequelize.INTEGER,
         primaryKey: true,
-        allowNull: false,
+        autoIncrement: true,
       },
-      username: {
-        type: DataTypes.STRING,
+      email: {
+        type: Sequelize.STRING,
         allowNull: false,
         unique: true,
       },
       password: {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: false,
       },
-      refreshToken: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-      },
-      createdAt: {
-        type: DataTypes.DATE,
+      created_at: {
+        type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: new Date(),
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
-      updatedAt: {
-        type: DataTypes.DATE,
+      updated_at: {
+        type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: new Date(),
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
     });
   },
-
-  down: async (queryInterface: QueryInterface) => {
+  down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('users');
   },
 };

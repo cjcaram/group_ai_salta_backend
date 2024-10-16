@@ -2,7 +2,8 @@
     "extends": "./tsconfig.json",
     "compilerOptions": {
       "outDir": "dist",
-      "module": "Node16"
+      "module": "CommonJS",
+      "moduleResolution":"Classic"
     },
     "include": ["src/migrations/**/*"]
   }
