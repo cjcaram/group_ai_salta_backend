@@ -62,6 +62,27 @@ This is a Node.js application using Express, Sequelize, and PostgreSQL. It provi
         CERT_PATH=path/to/your/certificate.crt
         ```
 
+5. **Install Flyway CLI**:
+    - Download and extract Flyway CLI:
+        ```sh
+        wget -qO- https://download.red-gate.com/maven/release/com/redgate/flyway/flyway-commandline/10.19.0/flyway-commandline-10.19.0-linux-x64.tar.gz | tar -xvz
+        ```
+    - Create a symbolic link to make Flyway accessible from anywhere:
+        ```sh
+        sudo ln -s `pwd`/flyway-10.19.0/flyway /usr/local/bin
+        ```
+
+6. **Run Migrations**:
+    - To run migrations, use the following command:
+        ```sh
+        flyway -configFiles=db/flyway.conf migrate
+        ```
+    - or you can use the npm script:
+        ```sh
+        npm run build:migrate
+        ```
+
+
 ## Running the Application
 
 1. **Build and run the application**:

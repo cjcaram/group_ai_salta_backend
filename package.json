@@ -10,7 +10,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "build:migrations": "tsc --project tsconfig.migrations.json",
+    "build:migrate": "flyway -configFiles=db/flyway.conf migrate",
     "start": "node dist/app.js",
     "dev": "node --env-file=.env --no-warnings=ExperimentalWarning --loader ts-node/esm src/app.ts"
   },
@@ -30,8 +30,7 @@
     "openai": "^4.57.0",
     "pg": "^8.13.0",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.4",
-    "sequelize-cli": "^6.6.2"
+    "sequelize": "^6.37.4"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
