@@ -12,6 +12,7 @@ const ASSISTANT_ID = process.env.ASSISTANT_ID;
 const VECTOR_ID = process.env.LEYES_SALTA_VS_ID;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const SERVER_URL = process.env.SERVER_URL;
+const PORT = process.env.PORT;
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const thisFileDirName = path.dirname(__filename);
@@ -90,7 +91,7 @@ export class OpenAIService {
 
         fs.writeFileSync(downloadPath, file_data_buffer);
 
-        return `${SERVER_URL}/api/downloads/${threadID}-${runID}.docx`;
+        return `${SERVER_URL}:${PORT}/api/downloads/${threadID}-${runID}.docx`;
     }
 
     async executePromtAndGetLastMessage(filePath: string, prompt: string) : Promise<AIFormattedResponse> {
