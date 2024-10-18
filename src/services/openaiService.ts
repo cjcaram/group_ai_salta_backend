@@ -2,8 +2,6 @@ import { Cache } from '../utils/Cache.js'
 import { OpenAI } from 'openai';
 import dotenv from 'dotenv';
 import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { AIFormattedResponse } from 'dto/AIFormattedResponse.js';
 
 dotenv.config();
@@ -13,10 +11,7 @@ const VECTOR_ID = process.env.LEYES_SALTA_VS_ID;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const SERVER_URL = process.env.SERVER_URL;
 const PORT = process.env.PORT;
-
-const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
-const thisFileDirName = path.dirname(__filename);
-const __dirname = thisFileDirName.substring(0, thisFileDirName.indexOf(process.env.PROJECT_NAME) + process.env.PROJECT_NAME.length + 1); 
+const DOWNLOADS_PATH = process.env.DOWNLOADS_PATH || 'downloads';
 
 export class OpenAIService {
 
@@ -87,7 +82,7 @@ export class OpenAIService {
         const responseFile = await this.openAI.files.content(fileId);
         const file = await responseFile.arrayBuffer();
         const file_data_buffer = Buffer.from(file);
-        const downloadPath = `${__dirname}downloads/${threadID}-${runID}.docx`;
+        const downloadPath = `${DOWNLOADS_PATH}/${threadID}-${runID}.docx`;
 
         fs.writeFileSync(downloadPath, file_data_buffer);
 

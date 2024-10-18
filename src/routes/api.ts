@@ -2,26 +2,21 @@ import express from 'express';
 import dotenv from 'dotenv';
 import multer from 'multer';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { OpenAIService } from '../services/openaiService.js';
 import { AIFormattedResponse } from '../dto/AIFormattedResponse.js';
 import { authenticateToken } from '../middleware/auth.js';
 
-/// CONFIG
-
 dotenv.config();
 
-const secret = process.env.JWT_SECRET || 'your_jwt_secret';
+const DOWNLOADS_PATH = process.env.DOWNLOADS_PATH || 'downloads';
+const UPLOADS_PATH = process.env.UPLOADS_PATH || 'uploads';
 
 const openAiService = new OpenAIService();
 const router = express.Router();
-const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
-const thisFileDirName = path.dirname(__filename);
-const __dirname = thisFileDirName.substring(0, thisFileDirName.indexOf(process.env.PROJECT_NAME) + process.env.PROJECT_NAME.length + 1); 
 
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
-        callback(null, 'uploads/');
+        callback(null, UPLOADS_PATH + '/');
     },
     filename: (req, file, callback) => {
         callback(null, file.originalname);
@@ -34,7 +29,7 @@ const upload = multer({ storage: storage });
 
 router.get('/downloads/:filename', authenticateToken, (req, res) => {
     const filename = req.params.filename;
-    const filePath = path.join(__dirname, 'downloads', filename);
+    const filePath = path.join(DOWNLOADS_PATH, filename);
     res.download(filePath, (err) => {
         if (err) {
             console.error('Error downloading file:', err);
@@ -83,7 +78,7 @@ router.post('/contestar-una-demanda', authenticateToken, upload.single('attachme
         Formato de la respuesta:
         La respuesta debe ser un archivo .docx, correctamente formateado, donde el contenido del archivo sea únicamente la contestación de la demanda.`;
 
-    const filePath = path.join(__dirname, 'uploads', fileAttached.filename);
+    const filePath = path.join(UPLOADS_PATH, fileAttached.filename);
     const response: AIFormattedResponse = await openAiService.executePromtAndGetLastMessage(filePath, prompt);
 
     console.log(JSON.stringify(response));

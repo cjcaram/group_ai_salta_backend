@@ -52,17 +52,46 @@ This is a Node.js application using Express, Sequelize, and PostgreSQL. It provi
 4. **Configure environment variables**:
     - Create a `.env` file in the root directory of your project and add the following:
         ```env
-        PORT=3000
-        DB_NAME=mydatabase
-        DB_USER=myuser
-        DB_PASSWORD=mypassword
+        OPENAI_API_KEY=asd
+        PORT=8080
+        ASSISTANT_ID=asst_asd
+        LEYES_SALTA_VS_ID=vs_asd
+        PROJECT_NAME=group_ai_salta_backend
+        SERVER_URL=http://localhost
+        FRONTEND_URL=http://localhost:5173
+
+        # JWT AND CERTS
+        JWT_SECRET=asd
+        JWT_REFRESH_SECRET=asd
+        KEY_PATH=~/certs/key.pem
+        CERT_PATH=~/certs/cert.pem
+
+        # Paths
+        DOWNLOADS_PATH=~/downloads
+        UPLOADS_PATH=~/uploads
+
+        # Database
+        DB_NAME=group_ai_salta
+        DB_USER=root
+        DB_PASSWORD=admin123
         DB_HOST=localhost
-        JWT_SECRET=your_jwt_secret
-        KEY_PATH=path/to/your/private.key
-        CERT_PATH=path/to/your/certificate.crt
+        DB_PORT=5432
         ```
 
-5. **Install Flyway CLI**:
+5. **Create necessary directories**:
+    - Create the `downloads` and `uploads` directories:
+        ```sh
+        mkdir -p ~/downloads ~/uploads
+        ```
+
+    - Add the following lines to your `.env` file:
+        ```env
+        DOWNLOADS_PATH=~/downloads
+        UPLOADS_PATH=~/uploads
+        ```
+
+
+6. **Install Flyway CLI**:
     - Download and extract Flyway CLI:
         ```sh
         wget -qO- https://download.red-gate.com/maven/release/com/redgate/flyway/flyway-commandline/10.19.0/flyway-commandline-10.19.0-linux-x64.tar.gz | tar -xvz
@@ -72,7 +101,7 @@ This is a Node.js application using Express, Sequelize, and PostgreSQL. It provi
         sudo ln -s `pwd`/flyway-10.19.0/flyway /usr/local/bin
         ```
 
-6. **Run Migrations**:
+7. **Run Migrations**:
     - To run migrations, use the following command:
         ```sh
         flyway -configFiles=db/flyway.conf migrate
