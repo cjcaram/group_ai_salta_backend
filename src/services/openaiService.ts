@@ -86,15 +86,15 @@ export class OpenAIService {
 
         fs.writeFileSync(downloadPath, file_data_buffer);
 
-        return `${SERVER_URL}:${PORT}/api/downloads/${threadID}-${runID}.docx`;
+        return `${threadID}-${runID}.docx`;
     }
 
     async executePromtAndGetLastMessage(filePath: string, prompt: string) : Promise<AIFormattedResponse> {
         
         let messages = await this.executeRunAndGetMessages(filePath, prompt);
-        let fileUrl = await this.saveFileFromOpenAI(messages);
+        let filename = await this.saveFileFromOpenAI(messages);
         return { message: 'Se ha generado el archivo .docx con la contestación de demanda solicitada. Puedes descargarlo utilizando el siguiente enlace:', 
-            fileUrl: fileUrl };
+            filename: filename };
     }
 }
 
