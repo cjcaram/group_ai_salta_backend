@@ -154,8 +154,14 @@ router.post('/logout', authenticateToken, async (req, res) => {
   }
 });
 
-router.get('/verify', authenticateToken, (req, res) => {
-  res.json({ user: req.user });
+router.get('/me', authenticateToken, async (req, res) => {
+  try {
+    let token = req.cookies.accessToken;
+    const payload = jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload;
+    res.json({ user: { id: payload.id, username: payload.username } });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener el usuario' });
+  }
 });
 
 export default router;
